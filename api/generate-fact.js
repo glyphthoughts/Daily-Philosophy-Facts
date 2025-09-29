@@ -10,13 +10,24 @@ export default async function handler(req) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{
+        systemInstruction: {
+          role: "system",
           parts: [{
-            text: `Generate one fascinating philosophy fact for ${dateString}. Keep it under 40 words, educational and engaging. Example: "Aristotle tutored Alexander the Great when he was just 13 years old, shaping one of history's greatest conqueors."`
+            text: "You are a philosophy fact generator. Generate only fascinating, educational philosophy facts. Keep responses under 40 words. Focus on historical events, biographical details, and interesting trivia about philosophers and philosophical movements. Be accurate and engaging."
+          }]
+        },
+        contents: [{
+          role: "user", 
+          parts: [{
+            text: `Generate one fascinating philosophy fact for ${dateString}. Example: "Aristotle tutored Alexander the Great when he was just 13 years old, shaping one of history's greatest conquerors."`
           }]
         }]
       })
     });
+
+    if (!response.ok) {
+      throw new Error('Gemini API request failed');
+    }
 
     const data = await response.json();
     
@@ -31,7 +42,7 @@ export default async function handler(req) {
   } catch (error) {
     return new Response(JSON.stringify({
       text: "Unable to connect to philosophy database. Please check your internet connection and try again.",
-      author: "Connection Error",
+      author: "Connection Error", 
       isError: true
     }), { 
       status: 500,
