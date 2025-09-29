@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/generate-fact.js": {
+      "runtime": "@vercel/edge"
+    }
+  }
+}
