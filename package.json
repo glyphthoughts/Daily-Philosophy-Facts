@@ -1,0 +1,22 @@
+{
+    "name": "glyph-thoughts-daily-philosophy-facts",
+    "version": "1.0.0",
+    "description": "Daily Philosophy Facts app with AI-generated content",
+    "main": "index.html",
+    "scripts": {
+        "dev": "vercel dev",
+        "build": "echo 'Static site - no build needed'",
+        "start": "echo 'Static site - no start needed'"
+    },
+    "dependencies": {},
+    "devDependencies": {},
+    "keywords": [
+        "philosophy",
+        "daily",
+        "facts",
+        "ai",
+        "gemini"
+    ],
+    "author": "Shantanu - GlyphThoughts",
+    "license": "MIT"
+}
