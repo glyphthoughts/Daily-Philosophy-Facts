@@ -1,8 +1,1 @@
-{
-    "outputDirectory": ".",
-    "functions": {
-        "api/generate-fact.js": {
-            "maxDuration": 30
-        }
-    }
-}
+
