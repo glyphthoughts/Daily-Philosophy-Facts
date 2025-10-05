@@ -1,52 +1,41 @@
-export default async function handler(req) {
-  if (req.method !== 'POST') {
-    return new Response('Method not allowed', { status: 405 });
-  }
-
-  const { dateString } = await req.json();
-  
-  try {
-    const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=' + process.env.GEMINI_API_KEY, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        systemInstruction: {
-          role: "system",
-          parts: [{
-            text: "You are a philosophy fact generator. Generate only fascinating, educational philosophy facts. Keep responses under 40 words. Focus on historical events, biographical details, and interesting trivia about philosophers and philosophical movements. Be accurate and engaging."
-          }]
-        },
-        contents: [{
-          role: "user", 
-          parts: [{
-            text: `Generate one fascinating philosophy fact for ${dateString}. Example: "Aristotle tutored Alexander the Great when he was just 13 years old, shaping one of history's greatest conquerors."`
-          }]
-        }]
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error('Gemini API request failed');
+export default async function handler(req, res) {
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const data = await response.json();
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
     
-    return new Response(JSON.stringify({
-      text: data.candidates[0].content.parts[0].text.replace(/"/g, ''),
-      author: "Philosophy History",
-      isError: false
-    }), {
-      headers: { 'Content-Type': 'application/json' }
-    });
-    
-  } catch (error) {
-    return new Response(JSON.stringify({
-      text: "Unable to connect to philosophy database. Please check your internet connection and try again.",
-      author: "Connection Error", 
-      isError: true
-    }), { 
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
-  }
+    if (!GEMINI_API_KEY) {
+        return res.status(500).json({ error: 'API key not configured' });
+    }
+
+    try {
+        const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{
+                            text: "Generate a single fascinating philosophical fact or quote. Keep it under 150 characters. Focus on ancient to modern philosophy."
+                        }]
+                    }]
+                })
+            }
+        );
+
+        const data = await response.json();
+        
+        if (data.candidates && data.candidates[0]) {
+            const fact = data.candidates[0].content.parts[0].text;
+            return res.status(200).json({ fact });
+        } else {
+            return res.status(500).json({ error: 'No content generated' });
+        }
+    } catch (error) {
+        return res.status(500).json({ error: 'Failed to generate fact' });
+    }
 }
